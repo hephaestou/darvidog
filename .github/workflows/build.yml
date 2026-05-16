@@ -10,13 +10,22 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          sudo apt-get install -y libtool libtool-bin autoconf automake pkg-config m4
+          sudo apt-get update
+          sudo apt-get install -y libtool libtool-bin autoconf automake pkg-config m4 build-essential ccache git zip unzip python3-dev libffi-dev libssl-dev zlib1g-dev libbz2-dev libsqlite3-dev
           pip install buildozer cython==0.29.37
       - name: Build APK
+        env:
+          BUILDOZER_WARN_ON_ROOT: 0
         run: |
-          yes | buildozer android debug
+          yes | buildozer android debug 2>&1 | tee build.log
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: darvidog-apk
           path: bin/*.apk
+      - name: Upload log if failed
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-log
+          path: build.log
