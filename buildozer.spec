@@ -22,6 +22,7 @@ android.minapi = 24
 android.ndk = 25b
 android.build_tools_version = 34.0.0
 android.accept_sdk_license = True
+android.sdk_path = /home/runner/.buildozer/android/platform/android-sdk
 
 [buildozer]
 log_level = 2
