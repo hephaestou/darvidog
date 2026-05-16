@@ -16,50 +16,12 @@ jobs:
       - name: Accept Android licenses
         run: |
           mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-          echo "d975f751698a77b662f1254ddbeed3901e976f5a" >> $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          printf "24333f8a63b6825ea9c5514f83c2829b004d1fee\nd975f751698a77b662f1254ddbeed3901e976f5a" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          printf "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
       - name: Build APK
         env:
-          BUILDOZER_WARN_ON_ROOT: 0
-        run: |
-          buildozer android debug 2>&1 | tee build.log
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: darvidog-apk
-          path: bin/*.apk
-      - name: Upload log if failed
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.logname: Build APK
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libtool libtool-bin autoconf automake pkg-config m4 build-essential ccache git zip unzip python3-dev libffi-dev libssl-dev zlib1g-dev libbz2-dev libsqlite3-dev
-          pip install buildozer cython==0.29.37
-      - name: Accept Android licenses
-        run: |
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/licenses
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-          echo "d975f751698a77b662f1254ddbeed3901e976f5a" >> $HOME/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-      - name: Build APK
-        env:
-          BUILDOZER_WARN_ON_ROOT: 0
-        run: |
-          buildozer android debug 2>&1 | tee build.log
+          BUILDOZER_WARN_ON_ROOT: '0'
+        run: buildozer android debug 2>&1 | tee build.log
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
