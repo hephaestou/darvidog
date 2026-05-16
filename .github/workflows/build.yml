@@ -31,16 +31,23 @@ jobs:
           mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
           ln -sf $SDKMANAGER $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
       - name: Build APK
+        continue-on-error: true
         env:
           BUILDOZER_WARN_ON_ROOT: '0'
         run: buildozer android debug 2>&1 | tee build.log
+      - name: Show build errors
+        if: always()
+        run: |
+          echo "=== ERRORS FOUND ==="
+          grep -i "\[ERROR\]" build.log | tail -20 || echo "No ERROR lines found"
+          grep -i "error:" build.log | tail -20 || echo "No error lines found"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: darvidog-apk
           path: bin/*.apk
       - name: Upload log if failed
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-log
