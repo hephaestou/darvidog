@@ -8,7 +8,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,wav
 
 version = 1.0
 
-requirements = python3==3.11.11,kivy==2.3.0,kivymd==1.2.0,plyer
+requirements = hostpython3==3.11.11,python3==3.11.11,kivy==2.3.0,kivymd==1.2.0,plyer
 
 android.permissions = CAMERA,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,FLASHLIGHT
 android.features = android.hardware.camera
