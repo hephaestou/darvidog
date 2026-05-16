@@ -25,12 +25,14 @@ jobs:
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip -q commandlinetools-linux-11076708_latest.zip
           mv cmdline-tools latest
-          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
-          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;34.0.0" "platforms;android-33"
+          SDKMANAGER=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager
+          yes | $SDKMANAGER --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
+          yes | $SDKMANAGER --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;34.0.0" "platforms;android-33" "tools"
+          mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
+          ln -s $SDKMANAGER $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
       - name: Build APK
         env:
           BUILDOZER_WARN_ON_ROOT: '0'
-          ANDROIDSDK: '/home/runner/.buildozer/android/platform/android-sdk'
         run: buildozer android debug 2>&1 | tee build.log
       - name: Upload APK
         uses: actions/upload-artifact@v4
