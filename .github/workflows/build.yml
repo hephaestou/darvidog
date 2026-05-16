@@ -29,7 +29,7 @@ jobs:
           yes | $SDKMANAGER --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
           yes | $SDKMANAGER --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;34.0.0" "platforms;android-33" "tools"
           mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
-          ln -s $SDKMANAGER $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+          ln -sf $SDKMANAGER $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
       - name: Build APK
         env:
           BUILDOZER_WARN_ON_ROOT: '0'
