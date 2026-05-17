@@ -1,9 +1,3 @@
-"""
-Soil Color Analyzer - Mobile App
-Kivy-based camera app for field soil color analysis
-Uses phone LED for consistent illumination
-"""
-
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -17,7 +11,6 @@ import os
 from pathlib import Path
 from datetime import datetime
 import json
-import shutil
 
 try:
     from plyer import flash
@@ -54,72 +47,37 @@ class SoilColorApp(App):
         header_layout = BoxLayout(orientation='vertical', size_hint=(1, 0.15), spacing=5)
 
         try:
-            logo = Image(
-                source='icon_corrected.png',
-                size_hint=(1, 0.7),
-                allow_stretch=True,
-                keep_ratio=True
-            )
+            logo = Image(source='icon_corrected.png', size_hint=(1, 0.7), allow_stretch=True, keep_ratio=True)
             header_layout.add_widget(logo)
         except:
             pass
 
-        title = Label(
-            text='[b]DARVIDOG[/b] Soil Analyser',
-            size_hint=(1, 0.3),
-            font_size='18sp',
-            markup=True,
-            color=(0.2, 0.2, 0.2, 1)
-        )
+        title = Label(text='[b]DARVIDOG[/b] Soil Analyser', size_hint=(1, 0.3), font_size='18sp', markup=True, color=(0.2, 0.2, 0.2, 1))
         header_layout.add_widget(title)
         layout.add_widget(header_layout)
 
-        instructions = Label(
-            text='Keep phone 15-20cm from soil\nLED provides consistent lighting',
-            size_hint=(1, 0.06),
-            font_size='12sp',
-            color=(0.7, 0.7, 0.7, 1)
-        )
+        instructions = Label(text='Keep phone 15-20cm from soil\nLED provides consistent lighting', size_hint=(1, 0.06), font_size='12sp', color=(0.7, 0.7, 0.7, 1))
         layout.add_widget(instructions)
 
         self.camera = Camera(play=True, resolution=(640, 480), size_hint=(1, 0.5))
         layout.add_widget(self.camera)
 
-        self.flash_btn = ToggleButton(
-            text='LED: OFF',
-            size_hint=(1, 0.08),
-            font_size='16sp',
-            background_color=(0.5, 0.5, 0.5, 1)
-        )
+        self.flash_btn = ToggleButton(text='LED: OFF', size_hint=(1, 0.08), font_size='16sp', background_color=(0.5, 0.5, 0.5, 1))
         self.flash_btn.bind(on_press=self.toggle_flash)
         layout.add_widget(self.flash_btn)
 
         Clock.schedule_once(lambda dt: self.flash_btn.trigger_action(), 0.5)
 
-        self.result_label = Label(
-            text='Point camera at soil sample\nTurn on LED for best results',
-            size_hint=(1, 0.12),
-            font_size='16sp',
-            halign='center'
-        )
+        self.result_label = Label(text='Point camera at soil sample\nTurn on LED for best results', size_hint=(1, 0.12), font_size='16sp', halign='center')
         layout.add_widget(self.result_label)
 
         button_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.12), spacing=10)
 
-        capture_btn = Button(
-            text='ANALYZE',
-            font_size='18sp',
-            bold=True,
-            background_color=(0.2, 0.6, 0.2, 1)
-        )
+        capture_btn = Button(text='ANALYZE', font_size='18sp', bold=True, background_color=(0.2, 0.6, 0.2, 1))
         capture_btn.bind(on_press=self.capture_and_analyze)
         button_layout.add_widget(capture_btn)
 
-        save_btn = Button(
-            text='SAVE',
-            font_size='18sp',
-            background_color=(0.2, 0.4, 0.8, 1)
-        )
+        save_btn = Button(text='SAVE', font_size='18sp', background_color=(0.2, 0.4, 0.8, 1))
         save_btn.bind(on_press=self.save_result)
         button_layout.add_widget(save_btn)
 
@@ -159,16 +117,13 @@ class SoilColorApp(App):
 
         self.result_label.text = 'Analyzing...'
 
-        # Get pixels from camera texture
         texture = self.camera.texture
         pixels = texture.pixels
         width, height = texture.size
 
-        # Sample pixels from the centre of the image
-        # Each pixel is RGBA (4 bytes)
         total_r = total_g = total_b = count = 0
         cx, cy = width // 2, height // 2
-        sample = 50  # sample a 100x100 block in the centre
+        sample = 50
 
         for y in range(cy - sample, cy + sample):
             for x in range(cx - sample, cx + sample):
@@ -192,14 +147,9 @@ class SoilColorApp(App):
             self.current_result = {
                 'munsell_notation': result['munsell'],
                 'confidence': result['confidence'],
-                'calibrated': False,
                 'rgb': {'r': avg_r, 'g': avg_g, 'b': avg_b}
             }
-
-            self.result_label.text = (
-                f"MUNSELL: {result['munsell']}\n"
-                f"Confidence: {result['confidence']}%"
-            )
+            self.result_label.text = f"MUNSELL: {result['munsell']}\nConfidence: {result['confidence']}%"
         except Exception as e:
             self.result_label.text = f'Error: {str(e)}'
 
@@ -220,7 +170,7 @@ class SoilColorApp(App):
         with open(json_path, 'w') as f:
             json.dump(result_with_metadata, f, indent=2)
 
-        self.result_label.text = f'Saved!\nReady for next sample'
+        self.result_label.text = 'Saved!\nReady for next sample'
 
     def on_stop(self):
         if FLASH_AVAILABLE and self.flash_on:
