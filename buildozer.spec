@@ -5,7 +5,7 @@ package.domain = com.gaiandynamics
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,json,wav
 version = 1.0
-requirements = python3,kivy==2.3.0,plyer
+requirements = python3,kivy==2.3.1,plyer
 android.permissions = CAMERA,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,FLASHLIGHT
 android.features = android.hardware.camera
 orientation = portrait
