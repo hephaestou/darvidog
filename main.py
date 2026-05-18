@@ -59,8 +59,16 @@ class SoilColorApp(App):
         instructions = Label(text='Keep phone 15-20cm from soil\nLED provides consistent lighting', size_hint=(1, 0.06), font_size='12sp', color=(0.7, 0.7, 0.7, 1))
         layout.add_widget(instructions)
 
-        self.camera = Camera(play=True, resolution=(640, 480), size_hint=(1, 0.5))
-        layout.add_widget(self.camera)
+    try:
+    self.camera = Camera(play=True, resolution=(640, 480), size_hint=(1, 0.5))
+    layout.add_widget(self.camera)
+except Exception as e:
+    self.camera = None
+    error_label = Label(
+        text=f'Camera error: {str(e)}\nPlease grant camera permission',
+        size_hint=(1, 0.5)
+    )
+    layout.add_widget(error_label)
 
         self.flash_btn = ToggleButton(text='LED: OFF', size_hint=(1, 0.08), font_size='16sp', background_color=(0.5, 0.5, 0.5, 1))
         self.flash_btn.bind(on_press=self.toggle_flash)
