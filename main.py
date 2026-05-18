@@ -60,15 +60,15 @@ class SoilColorApp(App):
         layout.add_widget(instructions)
 
     try:
-    self.camera = Camera(play=True, resolution=(640, 480), size_hint=(1, 0.5))
-    layout.add_widget(self.camera)
+        self.camera = Camera(play=True, resolution=(640, 480), size_hint=(1, 0.5))
+        layout.add_widget(self.camera)
 except Exception as e:
-    self.camera = None
-    error_label = Label(
-        text=f'Camera error: {str(e)}\nPlease grant camera permission',
-        size_hint=(1, 0.5)
-    )
-    layout.add_widget(error_label)
+        self.camera = None
+        error_label = Label(
+            text=f'Camera error: {str(e)}\nPlease grant camera permission',
+            size_hint=(1, 0.5)
+        )
+        layout.add_widget(error_label)
 
         self.flash_btn = ToggleButton(text='LED: OFF', size_hint=(1, 0.08), font_size='16sp', background_color=(0.5, 0.5, 0.5, 1))
         self.flash_btn.bind(on_press=self.toggle_flash)
