@@ -2,7 +2,7 @@ import os
 os.environ['KIVY_GL_BACKEND'] = 'sdl2'
 os.environ['KIVY_WINDOW'] = 'sdl2'
 os.environ['KIVY_METRICS_DENSITY'] = '2'
-os.environ['KIVY_DPI'] = '96'
+os.environ['KIVY_DPI'] = '200'
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
