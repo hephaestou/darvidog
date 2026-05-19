@@ -56,7 +56,7 @@ class SoilColorApp(App):
         instructions = Label(text='Keep phone 15-20cm from soil\nLED provides consistent lighting', size_hint=(1, 0.06), font_size='12sp', color=(0.7, 0.7, 0.7, 1))
         layout.add_widget(instructions)
         try:
-            self.camera = Camera(play=True, resolution=(640, 480), size_hint=(1, 0.5))
+            self.camera = Camera(play=False, resolution=(640, 480), size_hint=(1, 0.5))
             layout.add_widget(self.camera)
         except Exception as e:
             self.camera = None
