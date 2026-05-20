@@ -1,6 +1,4 @@
 import os
-os.environ['KIVY_GL_BACKEND'] = 'sdl2'
-os.environ['KIVY_WINDOW'] = 'sdl2'
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -8,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.camera import Camera
 from kivy.uix.image import Image
+from kivy.clock import Clock
 from soil_analyzer import SoilColorAnalyzer
 
 class DarvidogApp(App):
@@ -58,9 +57,9 @@ class DarvidogApp(App):
         # Buttons
         btn_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.2), spacing=8)
 
-        btn_camera = Button(text='Start Camera', font_size='13sp', background_color=(0.2, 0.4, 0.8, 1), background_normal='')
-        btn_camera.bind(on_press=self.start_camera)
-        btn_layout.add_widget(btn_camera)
+        self.btn_camera = Button(text='Start Camera', font_size='13sp', background_color=(0.2, 0.4, 0.8, 1), background_normal='')
+        self.btn_camera.bind(on_press=self.toggle_camera)
+        btn_layout.add_widget(self.btn_camera)
 
         btn_analyze = Button(text='Analyse', font_size='13sp', background_color=(0.2, 0.6, 0.2, 1), background_normal='')
         btn_analyze.bind(on_press=self.analyze)
@@ -69,21 +68,30 @@ class DarvidogApp(App):
         layout.add_widget(btn_layout)
         return layout
 
-    def start_camera(self, instance):
-        if self.camera:
-            self.camera.play = True
-            self.result_label.text = 'Camera ready — point at soil and tap Analyse'
-            try:
-                from plyer import flash
-                flash.on()
-            except Exception as e:
-                self.result_label.text = f'LED error: {str(e)}'
-        else:
+    def toggle_camera(self, instance):
+        if not self.camera:
             self.result_label.text = 'No camera available'
+            return
+        if not self.camera.play:
+            self.camera.play = True
+            self.btn_camera.text = 'Stop Camera'
+            self.btn_camera.background_color = (0.8, 0.2, 0.2, 1)
+            self.result_label.text = 'Camera ready - point at soil and tap Analyse'
+        else:
+            self.camera.play = False
+            self.btn_camera.text = 'Start Camera'
+            self.btn_camera.background_color = (0.2, 0.4, 0.8, 1)
+            self.result_label.text = 'Camera stopped'
 
     def analyze(self, instance):
-        if not self.camera or not self.camera.texture:
+        if not self.camera or not self.camera.play:
             self.result_label.text = 'Tap Start Camera first!'
+            return
+        Clock.schedule_once(self._do_analyze, 0.1)
+
+    def _do_analyze(self, dt):
+        if not self.camera.texture:
+            self.result_label.text = 'No image yet - wait a moment'
             return
 
         texture = self.camera.texture
@@ -121,13 +129,6 @@ class DarvidogApp(App):
             f"Confidence: {result.get('confidence', 0)}%\n"
             f"RGB: {r}, {g}, {b}"
         )
-
-    def on_stop(self):
-        try:
-            from plyer import flash
-            flash.off()
-        except Exception:
-            pass
 
 if __name__ == '__main__':
     DarvidogApp().run()
