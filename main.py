@@ -7,9 +7,11 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.camera import Camera
+from kivy.uix.image import Image
+from kivy.core.window import Window
 from soil_analyzer import SoilColorAnalyzer
 
-class TestApp(App):
+class DarvidogApp(App):
     def build(self):
         try:
             from android.permissions import request_permissions, Permission
@@ -20,63 +22,114 @@ class TestApp(App):
         self.analyzer = SoilColorAnalyzer()
         self.camera = None
 
-        self.result_label = Label(
-            text='Press Start Camera first',
-            font_size='16sp',
-            halign='center',
-            size_hint=(1, 0.15)
+        # Main layout - dark background
+        layout = BoxLayout(
+            orientation='vertical',
+            padding=8,
+            spacing=6
         )
 
+        # Header with logo and title
+        header = BoxLayout(
+            orientation='horizontal',
+            size_hint=(1, 0.1),
+            spacing=10
+        )
+        try:
+            logo = Image(
+                source='icon_corrected.png',
+                size_hint=(0.15, 1),
+                allow_stretch=True,
+                keep_ratio=True
+            )
+            header.add_widget(logo)
+        except Exception:
+            pass
+
+        title = Label(
+            text='[b]DARVIDOG[/b] Soil Analyser',
+            font_size='18sp',
+            markup=True,
+            color=(1, 1, 1, 1),
+            halign='left',
+            valign='middle',
+            size_hint=(0.85, 1)
+        )
+        title.bind(size=title.setter('text_size'))
+        header.add_widget(title)
+        layout.add_widget(header)
+
+        # Camera view
         try:
             self.camera = Camera(
                 play=False,
                 resolution=(640, 480),
-                size_hint=(1, 0.55)
+                size_hint=(1, 0.65)
             )
+            layout.add_widget(self.camera)
         except Exception as e:
-            self.result_label.text = f'Camera error: {str(e)}'
+            layout.add_widget(Label(
+                text=f'Camera error: {str(e)}',
+                size_hint=(1, 0.65)
+            ))
+
+        # Results label
+        self.result_label = Label(
+            text='Tap Start Camera then Analyse',
+            font_size='14sp',
+            halign='center',
+            valign='middle',
+            size_hint=(1, 0.12),
+            color=(0.9, 0.9, 0.9, 1)
+        )
+        self.result_label.bind(size=self.result_label.setter('text_size'))
+        layout.add_widget(self.result_label)
+
+        # Buttons
+        btn_layout = BoxLayout(
+            orientation='horizontal',
+            size_hint=(1, 0.13),
+            spacing=8
+        )
 
         btn_camera = Button(
             text='Start Camera',
-            font_size='16sp',
-            size_hint=(1, 0.15),
-            background_color=(0.2, 0.4, 0.8, 1)
+            font_size='14sp',
+            background_color=(0.2, 0.4, 0.8, 1),
+            background_normal=''
         )
         btn_camera.bind(on_press=self.start_camera)
+        btn_layout.add_widget(btn_camera)
 
         btn_analyze = Button(
             text='Analyse',
-            font_size='16sp',
-            size_hint=(1, 0.15),
-            background_color=(0.2, 0.6, 0.2, 1)
+            font_size='14sp',
+            background_color=(0.2, 0.6, 0.2, 1),
+            background_normal=''
         )
         btn_analyze.bind(on_press=self.analyze)
+        btn_layout.add_widget(btn_analyze)
 
-        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
-        layout.add_widget(self.result_label)
-        if self.camera:
-            layout.add_widget(self.camera)
-        layout.add_widget(btn_camera)
-        layout.add_widget(btn_analyze)
+        layout.add_widget(btn_layout)
+
         return layout
 
     def start_camera(self, instance):
         if self.camera:
             self.camera.play = True
-            self.result_label.text = 'Camera started - point at soil'
+            self.result_label.text = 'Camera ready — point at soil and tap Analyse'
         else:
             self.result_label.text = 'No camera available'
 
     def analyze(self, instance):
         if not self.camera or not self.camera.texture:
-            self.result_label.text = 'Start camera first!'
+            self.result_label.text = 'Tap Start Camera first!'
             return
 
         texture = self.camera.texture
         pixels = texture.pixels
         width, height = map(int, texture.size)
         colorfmt = texture.colorfmt
-
         cx, cy = width // 2, height // 2
         sample = 30
         total_r = total_g = total_b = count = 0
@@ -86,13 +139,9 @@ class TestApp(App):
                 idx = (y * width + x) * 4
                 if idx + 3 < len(pixels):
                     if colorfmt == 'bgra':
-                        b = pixels[idx]
-                        g = pixels[idx + 1]
-                        r = pixels[idx + 2]
+                        b, g, r = pixels[idx], pixels[idx+1], pixels[idx+2]
                     else:
-                        r = pixels[idx]
-                        g = pixels[idx + 1]
-                        b = pixels[idx + 2]
+                        r, g, b = pixels[idx], pixels[idx+1], pixels[idx+2]
                     total_r += r
                     total_g += g
                     total_b += b
@@ -108,10 +157,10 @@ class TestApp(App):
 
         result = self.analyzer.analyze_color(r, g, b)
         self.result_label.text = (
-            f"RGB: {r}, {g}, {b}\n"
-            f"MUNSELL: {result.get('munsell', 'unknown')}\n"
-            f"Confidence: {result.get('confidence', 0)}%"
+            f"MUNSELL: {result.get('munsell', 'unknown')}    "
+            f"Confidence: {result.get('confidence', 0)}%\n"
+            f"RGB: {r}, {g}, {b}"
         )
 
 if __name__ == '__main__':
-    TestApp().run()
+    DarvidogApp().run()
