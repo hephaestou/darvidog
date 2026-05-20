@@ -21,55 +21,27 @@ class DarvidogApp(App):
         self.analyzer = SoilColorAnalyzer()
         self.camera = None
 
-        layout = BoxLayout(
-            orientation='vertical',
-            padding=8,
-            spacing=4
-        )
+        layout = BoxLayout(orientation='vertical', padding=8, spacing=6)
 
         # Header
-        header = BoxLayout(
-            orientation='horizontal',
-            size_hint=(1, 0.1),
-            spacing=10
-        )
+        header = BoxLayout(orientation='horizontal', size_hint=(1, 0.1), spacing=10)
         try:
-            logo = Image(
-                source='icon_corrected.png',
-                size_hint=(0.15, 1),
-                allow_stretch=True,
-                keep_ratio=True
-            )
+            logo = Image(source='icon_corrected.png', size_hint=(0.15, 1), allow_stretch=True, keep_ratio=True)
             header.add_widget(logo)
         except Exception:
             pass
 
-        title = Label(
-            text='[b]DARVIDOG[/b] Soil Analyser',
-            font_size='18sp',
-            markup=True,
-            color=(1, 1, 1, 1),
-            halign='left',
-            valign='middle',
-            size_hint=(0.85, 1)
-        )
+        title = Label(text='[b]DARVIDOG[/b] Soil Analyser', font_size='18sp', markup=True, color=(1, 1, 1, 1), halign='left', valign='middle', size_hint=(0.85, 1))
         title.bind(size=title.setter('text_size'))
         header.add_widget(title)
         layout.add_widget(header)
 
         # Camera
         try:
-            self.camera = Camera(
-                play=False,
-                resolution=(640, 480),
-                size_hint=(1, 0.72)
-            )
+            self.camera = Camera(play=False, resolution=(640, 480), size_hint=(1, 0.55))
             layout.add_widget(self.camera)
         except Exception as e:
-            layout.add_widget(Label(
-                text=f'Camera error: {str(e)}',
-                size_hint=(1, 0.72)
-            ))
+            layout.add_widget(Label(text=f'Camera error: {str(e)}', size_hint=(1, 0.55)))
 
         # Results
         self.result_label = Label(
@@ -77,39 +49,24 @@ class DarvidogApp(App):
             font_size='13sp',
             halign='center',
             valign='middle',
-            size_hint=(1, 0.1),
+            size_hint=(1, 0.15),
             color=(0.9, 0.9, 0.9, 1)
         )
         self.result_label.bind(size=self.result_label.setter('text_size'))
         layout.add_widget(self.result_label)
 
         # Buttons
-        btn_layout = BoxLayout(
-            orientation='horizontal',
-            size_hint=(1, 0.08),
-            spacing=8
-        )
+        btn_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.2), spacing=8)
 
-        btn_camera = Button(
-            text='Start Camera',
-            font_size='13sp',
-            background_color=(0.2, 0.4, 0.8, 1),
-            background_normal=''
-        )
+        btn_camera = Button(text='Start Camera', font_size='13sp', background_color=(0.2, 0.4, 0.8, 1), background_normal='')
         btn_camera.bind(on_press=self.start_camera)
         btn_layout.add_widget(btn_camera)
 
-        btn_analyze = Button(
-            text='Analyse',
-            font_size='13sp',
-            background_color=(0.2, 0.6, 0.2, 1),
-            background_normal=''
-        )
+        btn_analyze = Button(text='Analyse', font_size='13sp', background_color=(0.2, 0.6, 0.2, 1), background_normal='')
         btn_analyze.bind(on_press=self.analyze)
         btn_layout.add_widget(btn_analyze)
 
         layout.add_widget(btn_layout)
-
         return layout
 
     def start_camera(self, instance):
@@ -119,8 +76,8 @@ class DarvidogApp(App):
             try:
                 from plyer import flash
                 flash.on()
-            except Exception:
-                pass
+            except Exception as e:
+                self.result_label.text = f'LED error: {str(e)}'
         else:
             self.result_label.text = 'No camera available'
 
