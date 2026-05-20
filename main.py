@@ -8,7 +8,6 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.camera import Camera
 from kivy.uix.image import Image
-from kivy.core.window import Window
 from soil_analyzer import SoilColorAnalyzer
 
 class DarvidogApp(App):
@@ -22,14 +21,13 @@ class DarvidogApp(App):
         self.analyzer = SoilColorAnalyzer()
         self.camera = None
 
-        # Main layout - dark background
         layout = BoxLayout(
             orientation='vertical',
             padding=8,
-            spacing=6
+            spacing=4
         )
 
-        # Header with logo and title
+        # Header
         header = BoxLayout(
             orientation='horizontal',
             size_hint=(1, 0.1),
@@ -59,27 +57,27 @@ class DarvidogApp(App):
         header.add_widget(title)
         layout.add_widget(header)
 
-        # Camera view
+        # Camera
         try:
             self.camera = Camera(
                 play=False,
                 resolution=(640, 480),
-                size_hint=(1, 0.65)
+                size_hint=(1, 0.72)
             )
             layout.add_widget(self.camera)
         except Exception as e:
             layout.add_widget(Label(
                 text=f'Camera error: {str(e)}',
-                size_hint=(1, 0.65)
+                size_hint=(1, 0.72)
             ))
 
-        # Results label
+        # Results
         self.result_label = Label(
             text='Tap Start Camera then Analyse',
-            font_size='14sp',
+            font_size='13sp',
             halign='center',
             valign='middle',
-            size_hint=(1, 0.12),
+            size_hint=(1, 0.1),
             color=(0.9, 0.9, 0.9, 1)
         )
         self.result_label.bind(size=self.result_label.setter('text_size'))
@@ -88,13 +86,13 @@ class DarvidogApp(App):
         # Buttons
         btn_layout = BoxLayout(
             orientation='horizontal',
-            size_hint=(1, 0.13),
+            size_hint=(1, 0.08),
             spacing=8
         )
 
         btn_camera = Button(
             text='Start Camera',
-            font_size='14sp',
+            font_size='13sp',
             background_color=(0.2, 0.4, 0.8, 1),
             background_normal=''
         )
@@ -103,7 +101,7 @@ class DarvidogApp(App):
 
         btn_analyze = Button(
             text='Analyse',
-            font_size='14sp',
+            font_size='13sp',
             background_color=(0.2, 0.6, 0.2, 1),
             background_normal=''
         )
@@ -118,6 +116,11 @@ class DarvidogApp(App):
         if self.camera:
             self.camera.play = True
             self.result_label.text = 'Camera ready — point at soil and tap Analyse'
+            try:
+                from plyer import flash
+                flash.on()
+            except Exception:
+                pass
         else:
             self.result_label.text = 'No camera available'
 
@@ -161,6 +164,13 @@ class DarvidogApp(App):
             f"Confidence: {result.get('confidence', 0)}%\n"
             f"RGB: {r}, {g}, {b}"
         )
+
+    def on_stop(self):
+        try:
+            from plyer import flash
+            flash.off()
+        except Exception:
+            pass
 
 if __name__ == '__main__':
     DarvidogApp().run()
