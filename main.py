@@ -89,29 +89,32 @@ class DarvidogApp(App):
             self.btn_camera.background_color = (0.2, 0.4, 0.8, 1)
             self.result_label.text = 'Camera stopped'
 
-    def toggle_torch(self, instance):
-        try:
-            from jnius import autoclass
-            PythonActivity = autoclass('org.kivy.android.PythonActivity')
-            Context = autoclass('android.content.Context')
-            context = PythonActivity.mActivity
-            manager = context.getSystemService(Context.CAMERA_SERVICE)
-            camera_ids = manager.getCameraIdList()
-            if not camera_ids:
-                self.result_label.text = 'No camera found for flash'
-                return
-            new_state = not self.torch_on
-            manager.setTorchMode(camera_ids[0], new_state)
-            self.torch_on = new_state
-            if self.torch_on:
-                instance.text = 'Flash OFF'
-                instance.background_color = (1, 0.8, 0, 1)
-            else:
-                instance.text = 'Flash ON'
-                instance.background_color = (0.5, 0.5, 0, 1)
-        except Exception as e:
-            self.result_label.text = f'Flash error: {str(e)}'
-
+def toggle_torch(self, instance):
+    if not self.camera or not self.camera.play:
+        self.result_label.text = 'Start camera first, then use flash'
+        return
+    try:
+        from jnius import autoclass
+        PythonActivity = autoclass('org.kivy.android.PythonActivity')
+        Context = autoclass('android.content.Context')
+        context = PythonActivity.mActivity
+        manager = context.getSystemService(Context.CAMERA_SERVICE)
+        camera_ids = manager.getCameraIdList()
+        if not camera_ids:
+            self.result_label.text = 'No camera found for flash'
+            return
+        new_state = not self.torch_on
+        manager.setTorchMode(camera_ids[0], new_state)
+        self.torch_on = new_state
+        if self.torch_on:
+            instance.text = 'Flash OFF'
+            instance.background_color = (1, 0.8, 0, 1)
+        else:
+            instance.text = 'Flash ON'
+            instance.background_color = (0.5, 0.5, 0, 1)
+    except Exception as e:
+        self.result_label.text = f'Flash error: {str(e)}'
+        
     def analyze(self, instance):
         if not self.camera or not self.camera.play:
             self.result_label.text = 'Tap Start Camera first!'
